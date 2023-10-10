@@ -10,6 +10,7 @@ import '../Model/Get_city.dart';
 import '../Model/Get_state.dart';
 import '../Utils/CustomButton.dart';
 
+String? wallet_balance;
 class MyProfile extends StatefulWidget {
   const MyProfile({Key? key}) : super(key: key);
 
@@ -46,7 +47,6 @@ class _MyProfileState extends State<MyProfile> {
   @override
   void initState(){
     super.initState();
-    fetch_state();
     getIdData();
   }
   var userId;
@@ -74,7 +74,7 @@ class _MyProfileState extends State<MyProfile> {
               child: Column(
                 children: [
                   SizedBox(
-                    height: MediaQuery.of(context).size.height / 18,
+                    height: MediaQuery.of(context).size.height/18,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -83,7 +83,7 @@ class _MyProfileState extends State<MyProfile> {
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Icon(
+                        child: const Icon(
                           Icons.arrow_back_ios_new,
                           size: 18,
                         ),
@@ -91,8 +91,8 @@ class _MyProfileState extends State<MyProfile> {
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 3,
                       ),
-                      Text(
-                        "MyProfile",
+                      const Text(
+                        "My Profile",
                         style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
                       ),
                     ],
@@ -111,7 +111,7 @@ class _MyProfileState extends State<MyProfile> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(14),
                             child: imageFile == null ||imageFile == "" ?
-                            Image.asset("assets/images/doctor.jpg", fit: BoxFit.cover) : Image.network("${getData?.data[0]['image']}", fit: BoxFit.fill,)
+                            Image.asset("assets/images/doctor.jpg", fit: BoxFit.cover) : Image.network("${getData?.data?[0].image}", fit: BoxFit.fill,)
                           ),
                       ),
                       SizedBox(
@@ -134,7 +134,6 @@ class _MyProfileState extends State<MyProfile> {
                               height: MediaQuery.of(context).size.height / 102,
                             ),
                             Text("Change Profile Picture",style: TextStyle(color: Colors.blue,fontSize: 13,fontWeight: FontWeight.bold),),
-
                           ],
                         ),
                       ),
@@ -159,23 +158,19 @@ class _MyProfileState extends State<MyProfile> {
                   SizedBox(
                     height: MediaQuery.of(context).size.height / 50,
                   ),
-
                   Form(
                     key: _formKey,
                     child: Column(
                       children: [
-
                         TextFormField(
                           controller: namecn,
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['username'].toString()}",
+                              hintText: "${getData?.data?[0].username.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               prefixIcon:  Icon(Icons.person),
-
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8))),
-
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return "Please Enter name";
@@ -191,15 +186,12 @@ class _MyProfileState extends State<MyProfile> {
                           controller: phonecn,
                           maxLength: 10,
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['mobile'].toString()}",
+                              hintText: "${getData?.data?[0].mobile.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               counterText: '',
                               prefixIcon:  Icon(Icons.phone),
-
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8))),
-
+                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8))),
                           validator: (value) {
                             if ( value!.isEmpty||value.length<10) {
                               return "Please Enter Mobile no";
@@ -214,15 +206,12 @@ class _MyProfileState extends State<MyProfile> {
                           keyboardType: TextInputType.text,
                           controller: gendercn,
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['gender'].toString()}",
+                              hintText: "${getData?.data?[0].gender.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
-
                               prefixIcon:  Icon(Icons.person),
-
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8))),
-
                           validator: (value) {
                             if ( value!.isEmpty) {
                               return "Please Enter Gender";
@@ -237,15 +226,13 @@ class _MyProfileState extends State<MyProfile> {
                           keyboardType: TextInputType.emailAddress,
                           controller: emailcn,
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['email'].toString()}",
+                              hintText: "${getData?.data?[0].email.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               counterText: '',
                               prefixIcon:  Icon(Icons.email),
-
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8))),
-
                           validator: (value) {
                             if ( value!.isEmpty) {
                               return "Please Enter email";
@@ -260,15 +247,13 @@ class _MyProfileState extends State<MyProfile> {
                           keyboardType: TextInputType.text,
                           controller: cliniaddcn,
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['clinic_address'].toString()}",
+                              hintText: "${getData?.data?[0].clinicAddress.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               counterText: '',
                               prefixIcon:  Icon(Icons.location_on_sharp),
-
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8))),
-
                           validator: (value) {
                             if ( value!.isEmpty) {
                               return "Please Enter address";
@@ -282,17 +267,14 @@ class _MyProfileState extends State<MyProfile> {
                         TextFormField(
                           keyboardType: TextInputType.text,
                           controller:exprincecn,
-
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['experience'].toString()}",
+                              hintText: "${getData?.data?[0].experience.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               counterText: '',
                               prefixIcon:  Icon(Icons.person),
-
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8))),
-
                           validator: (value) {
                             if ( value!.isEmpty) {
                               return "Please Enter experince";
@@ -304,9 +286,7 @@ class _MyProfileState extends State<MyProfile> {
                           height: MediaQuery.of(context).size.height / 60,
                         ),
                         DropdownButtonFormField<String>(
-
                           value: Service_type,
-
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please Enter Service type';
@@ -314,7 +294,6 @@ class _MyProfileState extends State<MyProfile> {
                               return null;
                             }
                           },
-
                           onChanged: (newValue) {
                             setState(() {
                               Service_type= newValue;
@@ -326,16 +305,14 @@ class _MyProfileState extends State<MyProfile> {
                               child: Text(item),
                             );
                           }).toList(),
-
                           //   icon  : Icon(Icons.medical_services),
                           decoration: InputDecoration(
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                             hintText:
-                            '  ${getData?.data[0]['service_type'].toString()}',
+                            '  ${getData?.data?[0].serviceType.toString()}',
                             fillColor: Colors.indigo[100] ,
                             filled: true,
                             // label: Text(  'Servive Type',)//
-
                           ),
                         ),
                         SizedBox(
@@ -344,17 +321,14 @@ class _MyProfileState extends State<MyProfile> {
                         TextFormField(
                           keyboardType: TextInputType.text,
                           controller:consentencycn,
-
                           decoration: InputDecoration(
-                              hintText: " ${getData?.data[0]['consultancy_fees'].toString()}",
+                              hintText: " ${getData?.data?[0].consultancyFees.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               counterText: '',
                               prefixIcon:  Icon(Icons.currency_rupee),
-
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8))),
-
                           validator: (value) {
                             if ( value!.isEmpty) {
                               return "Please Enter counsentency fees";
@@ -368,17 +342,14 @@ class _MyProfileState extends State<MyProfile> {
                         TextFormField(
                           keyboardType: TextInputType.text,
                           controller:storedcn,
-
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['consultancy_fees'].toString()}",
+                              hintText: "${getData?.data?[0].consultancyFees.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               counterText: '',
                               prefixIcon:  Icon(Icons.person),
-
                               border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8))),
-
                           validator: (value) {
                             if ( value!.isEmpty) {
                               return "Please Enter description";
@@ -392,7 +363,7 @@ class _MyProfileState extends State<MyProfile> {
                         TextFormField(
                           controller: opentimecn,
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['open_time'].toString()}",
+                              hintText: "${getData?.data?[0].openTime.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               prefixIcon: IconButton(
@@ -438,7 +409,7 @@ class _MyProfileState extends State<MyProfile> {
                         TextFormField(
                           controller: closetimecn,
                           decoration: InputDecoration(
-                              hintText: "${getData?.data[0]['close_time'].toString()}",
+                              hintText: "${getData?.data?[0].closeTime.toString()}",
                               fillColor: Colors.indigo[100] ,
                               filled: true,
                               prefixIcon: IconButton(
@@ -480,85 +451,21 @@ class _MyProfileState extends State<MyProfile> {
                         SizedBox(
                           height: MediaQuery.of(context).size.height / 60,
                         ),
-                        DropdownButtonFormField<String>(
-                          // value: selectedState,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please Enter Your state';
-                            } else {
-                              return null;
-                            }
-                          },
-                          onChanged: (newValue) {
-                            setState(() {
-                              stateId=newValue;
-                              print('======${stateId}');
-                              fetch_city();
-                              // cityId=null;
-                            });
-                          },
-                          items:getState?.data.map((items) {
-                            return DropdownMenuItem(
-                              value: items.id.toString()??'',
-                              child: Text(items.name??''),
-                            );}).toList(),
-                          //   icon  : Icon(Icons.medical_services),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            hintText:
-                            ' ${getData?.data[0]['state'].toString()}',
-                            fillColor: Colors.indigo[100] ,
-                            filled: true,
-                            // label: Text(  'Servive Type',)//
-                          ),
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height / 60,
-                        ),
-                        DropdownButtonFormField<String>(
-                          // value: selectedCity,
-                          validator: (value) {
-                            if (value==null|| value.isEmpty) {
-                              return 'Please Enter Your City';
-                            } else {
-                              return null;
-                            }
-                          },
-                          onChanged: (newValue) {
-                            setState(() {
-                              cityId=newValue;
-                              print(cityId);
-                            });
-                          },
-                          items: getCity?.data.map((items) {
-                            return DropdownMenuItem(
-                              value: items.id.toString()??'',
-                              child: Text(items.name??''),
-                            );
-                          }).toList(),
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                            hintText:
-                            '${getData?.data[0]['city'].toString()}',
-                            fillColor: Colors.indigo[100] ,
-                            filled: true,
-                            // label: Text(  'Servive Type',)//
-                          ),
-                        ),
                       ],
                     ),
                   ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height / 50,
+                    height: MediaQuery.of(context).size.height/50,
                   ),
-                  // InkWell(onTap: (){
-                  //   if(_formKey.currentState!.validate()){
-                  //     // Navigator.pushNamed(context, "support");
-                  //   }
-                  // },
-                  //     child: CustomButton(name: 'Update',)),
-                  // SizedBox(
-                  //   height: MediaQuery.of(context).size.height / 90,),
+                  InkWell(
+                      onTap: () {
+                    if(_formKey.currentState!.validate()){
+                      // Navigator.pushNamed(context, "support");
+                    }
+                  },
+                      child: CustomButton(name: 'Update',)),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height / 90,),
                 ],
               ),
             ),
@@ -568,52 +475,6 @@ class _MyProfileState extends State<MyProfile> {
     );
   }
 
-  GetState? getState;
-  void fetch_state()async{
-    var headers = {
-      'Cookie': 'ci_session=e32f527aeaa52b5e5592c3c5f7c2a8995e3faa40'
-    };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/dr_vet_app/app/v1/api/get_states'));
-    request.headers.addAll(headers);
-    http.StreamedResponse response = await request.send();
-    if (response.statusCode == 200) {
-      var data = await response.stream.bytesToString();
-      var finalresult = GetState.fromJson(json.decode(data));
-      setState(() {
-        getState=finalresult;
-      });
-    }
-    else {
-      print(response.reasonPhrase);
-    }
-  }
-
-  GetCity? getCity;
-  void fetch_city()async{
-
-    var headers = {
-      'Cookie': 'ci_session=2c03ee94b38d09c61ef05aca49a722333535f734'
-    };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/dr_vet_app/app/v1/api/get_cities'));
-    request.fields.addAll({
-      'state_id': '${stateId.toString()}'
-    });
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var data=await response.stream.bytesToString() ;
-      // print('city==${data}');
-      var finalresult=GetCity.fromJson(json.decode(data));
-      setState(() {
-        getCity = finalresult;
-      });
-    }
-    else {
-      print(response.reasonPhrase);
-    }
-  }
 
   File? imageFile;
   File? petImage;
@@ -703,7 +564,10 @@ class _MyProfileState extends State<MyProfile> {
     if (response.statusCode == 200) {
       var data=await response.stream.bytesToString();
       var finalresult=GetData.fromJson(json.decode(data));
+
       setState(() {
+        wallet_balance = getData?.data?[0].balance.toString();
+        preferences.setString('wallet_balance', wallet_balance ?? "");
         getData=finalresult;
       });
     }

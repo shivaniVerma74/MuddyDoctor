@@ -1,14 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:doctor_app/Model/Get_state.dart';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:place_picker/entities/location_result.dart';
+import 'package:place_picker/widgets/place_picker.dart';
 //import 'package:geolocator/geolocator.dart';
-import '../Model/Get_city.dart';
 import '../Utils/CustomButton.dart';
 import 'package:http/http.dart'as http;
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_maps_place_picker_mb/google_maps_place_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import 'LoginScreen.dart';
+
 class Register extends StatefulWidget {
   const Register({Key? key}) : super(key: key);
   @override
@@ -16,8 +23,8 @@ class Register extends StatefulWidget {
 }
 var homelat;
 var homeLong;
-class _RegisterState extends State<Register> {
-
+class _RegisterState extends State<Register> with TickerProviderStateMixin{
+  late TabController tabController;
   final TextEditingController phonecn=TextEditingController();
   final TextEditingController namecn=TextEditingController();
   final  TextEditingController emailcn=TextEditingController();
@@ -29,34 +36,41 @@ class _RegisterState extends State<Register> {
   final TextEditingController closetimecn=TextEditingController();
   final TextEditingController clinicCtr=TextEditingController();
   final TextEditingController docidcn=TextEditingController();
+  final TextEditingController clinicnamecn=TextEditingController();
+  final TextEditingController qualificationcn=TextEditingController();
+  final TextEditingController selecttimecn=TextEditingController();
+  final TextEditingController docDegreeCtr = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   bool isHidden=true;
-  String dropdownvalue = "online";
+
+  String? dropdownvalue="online" ;
+  var selectedService;
   var items = [
     'online',
     'Inclinic',
     'both',
   ];
+
   //String? Service_type;
   // List<String> Service_Type=['Online','InClinic','both'];
 
-  String? selectedCity ;
-  String? selectedState ;
-  String? gender="Female";
+  String? gender= "Female";
   int num=1;
-  var cityId;
-  var stateId;
-
-
   TimeOfDay selectedTime = TimeOfDay.now();
   TimeOfDay selectedTime1 = TimeOfDay.now();
   @override
   void initState(){
     super.initState();
-    fetch_state();
-    // fetch_city();
+    tabController = TabController(length: 7, vsync: this);
   }
+
+
+  final List<String> daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  List<String> onSelectedWeek = [];
+  var selectedWeek;
+
+  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,7 +95,7 @@ class _RegisterState extends State<Register> {
                         Navigator.pop(context);
                         FocusScope.of(context).unfocus();
                       },
-                      child: Icon(
+                      child: const Icon(
                         Icons.arrow_back_ios_new,
                         size: 18,
                       ),
@@ -89,7 +103,7 @@ class _RegisterState extends State<Register> {
                     SizedBox(
                       width: MediaQuery.of(context).size.width / 4,
                     ),
-                    Text(
+                    const Text(
                       "Register Now",
                       style:
                       TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
@@ -99,11 +113,11 @@ class _RegisterState extends State<Register> {
               SizedBox(
                 height: MediaQuery.of(context).size.height / 17,
               ),
-              Text(
+              const Text(
                 "Your phone number is not registered yet.",
                 style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
               ),
-              Text(
+              const Text(
                 "Let us know basic details for registration.",
                 style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
               ),
@@ -114,51 +128,56 @@ class _RegisterState extends State<Register> {
                 key: _formKey,
                 child: Column(
                   children: [
-
-                    TextFormField(
-                      controller: namecn,
-                      decoration: InputDecoration(
-                          hintText: "Enter Name",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          prefixIcon:  Icon(Icons.person),
-
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please Enter name";
-                        }
-                        return null;
-                      },
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        controller: namecn,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Name",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            prefixIcon:  Icon(Icons.person),
+                            border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please Enter name";
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
+                      height: MediaQuery.of(context).size.height/60,
                     ),
-                    TextFormField(
-                      keyboardType: TextInputType.phone,
-                      controller: phonecn,
-                      maxLength: 10,
-                      decoration: InputDecoration(
-                          hintText: "Enter Mobile No",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.phone),
-
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if ( value!.isEmpty||value.length<10) {
-                          return "Please Enter Mobile no";
-                        }
-                        return null;
-                      },
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.phone,
+                        controller: phonecn,
+                        maxLength: 10,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Mobile No",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.phone),
+                             border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        validator: (value) {
+                          if ( value!.isEmpty||value.length<10) {
+                            return "Please Enter Mobile no";
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
+                      height: MediaQuery.of(context).size.height/60,
                     ),
                     Row(
                       children: [
@@ -172,7 +191,7 @@ class _RegisterState extends State<Register> {
                                 gender = value.toString();
                               });
                             }),
-                        Text("Male",
+                        const Text("Male",
                           // style: TextStyle(color: Color(0xff7F62B0))
                         ),
                         Radio(
@@ -185,109 +204,145 @@ class _RegisterState extends State<Register> {
                                 gender = value.toString();
                               });
                             }),
-                        Text(
+                        const Text(
                           "Female",
                           // style: TextStyle(color: Color(0xff7F62B0)),
                         )
                       ],
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
+                      height: MediaQuery.of(context).size.height/60,
                     ),
-                    TextFormField(
-                      keyboardType: TextInputType.emailAddress,
-                      controller: emailcn,
-                      decoration: InputDecoration(
-                          hintText: "Enter Email",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.email),
-
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if ( value!.isEmpty) {
-                          return "Please Enter email";
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller: passwordcn,
-                      obscureText: isHidden,
-                      maxLength: 8,
-                      decoration: InputDecoration(
-                          hintText: "Enter Password",
-
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.lock),
-                          suffixIcon: InkWell(onTap: PaaswordView,
-                              child: Icon(Icons.visibility)),
-
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if ( value!.isEmpty||value.length<6) {
-                          return "Please Enter password";
-                        }
-                        return null;
-                      },
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.emailAddress,
+                        controller: emailcn,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Email",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.email),
+                            border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        validator: (value) {
+                          if ( value!.isEmpty) {
+                            return "Please Enter email";
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
+                      height: MediaQuery.of(context).size.height/60,
                     ),
-                    TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller: clinicCtr,
-                      decoration: InputDecoration(
-                          hintText: "Enter Address",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.location_on_sharp),
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        controller: passwordcn,
+                        obscureText: isHidden,
+                        maxLength: 8,
+                        decoration: InputDecoration(
+                            hintText: "Enter Password",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.lock),
+                            suffixIcon: InkWell(onTap: PaaswordView,
+                                child: Icon(Icons.visibility)),
+                        border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
 
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if ( value!.isEmpty) {
-                          return "Please Enter location";
-                        }
-                        return null;
-                      },
+                        validator: (value) {
+                          if ( value!.isEmpty||value.length<6) {
+                            return "Please Enter password";
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
+                      height: MediaQuery.of(context).size.height/60,
                     ),
-                    TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller:exprincecn,
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        // onTap: () {
+                        //   Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //       builder: (context) => PlacePicker(
+                        //         apiKey: Platform.isAndroid
+                        //             ? "AIzaSyBRnd5Bpqec-SYN-wAYFECRw3OHd4vkfSA"
+                        //             : "AIzaSyBRnd5Bpqec-SYN-wAYFECRw3OHd4vkfSA",
+                        //         onPlacePicked: (result) {
+                        //           print(result.formattedAddress);
+                        //           setState(() {
+                        //             clinicCtr.text = result.formattedAddress.toString();
+                        //             pickLat = result.geometry!.location.lat;
+                        //             pickLong = result.geometry!.location.lng;
+                        //           });
+                        //           Navigator.of(context).pop();
+                        //           // distnce();
+                        //         },
+                        //         initialPosition: LatLng(currentLocation!.latitude, currentLocation!.longitude),
+                        //         useCurrentLocation: true,
+                        //       ),
+                        //     ),
+                        //   );
+                        // },
+                        keyboardType: TextInputType.text,
+                        controller: clinicCtr,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Address",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.location_on_sharp),
+                            border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        validator: (value) {
+                          if ( value!.isEmpty) {
+                            return "Please Enter location";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height/60,
+                    ),
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        controller:exprincecn,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Experience",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.person),
+                               border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
 
-                      decoration: InputDecoration(
-                          hintText: "Enter Experience",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.person),
-
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if ( value!.isEmpty) {
-                          return "Please Enter experince";
-                        }
-                        return null;
-                      },
+                        validator: (value) {
+                          if ( value!.isEmpty) {
+                            return "Please Enter experince";
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                     SizedBox(
                       height: MediaQuery.of(context).size.height / 60,
@@ -313,292 +368,383 @@ class _RegisterState extends State<Register> {
                     //     },
                     //   ),
                     // ),
-                    DropdownButtonFormField<String>(
-                      value: dropdownvalue,
-                      hint: Icon(Icons.arrow_drop_down_outlined),
-
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please Enter Service type';
-                        } else {
-                          return null;
-                        }
-                      },
-                      onChanged: (String? newValue) {
-                        setState(() {
-                          dropdownvalue= newValue!;
-                        });
-                      },
-                      items:items .map((String items) {
-                        return DropdownMenuItem(
-                          value: items,
-                          child: Text(items),
-                        );
-                      }).toList(),
-                      //   icon  : Icon(Icons.medical_services),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                        hintText:
-                        '  Service Type',
-                        fillColor: Colors.indigo[100] ,
-                        filled: true,
-                        // label: Text(  'Servive Type',)//
-                      ),
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller:consentencycn,
-
-                      decoration: InputDecoration(
-                          hintText: "Enter Consentency Fees",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.currency_rupee),
-
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if ( value!.isEmpty) {
-                          return "Please Enter counsentency fees";
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
-                    ),
-                    TextFormField(
-                      keyboardType: TextInputType.text,
-                      controller:storedcn,
-
-                      decoration: InputDecoration(
-                          hintText: "Enter Store Description",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.person),
-
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-
-                      validator: (value) {
-                        if ( value!.isEmpty) {
-                          return "Please Enter description";
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
-                    ),
-                    TextFormField(
-                      controller: opentimecn,
-                      decoration: InputDecoration(
-                          hintText: "Open Time",
-                          fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          prefixIcon: IconButton(
-                            onPressed: () async {
-                              showTimePicker(
-                                context: context,
-                                initialTime: selectedTime,
-                              ).then((value) {
-                                setState(() {
-                                  selectedTime = value!;
-                                  opentimecn.text = selectedTime
-                                      .format(context)
-                                      .toString();
-                                });
-                              });
-                            },
-                            icon: const Icon(Icons.watch_later_rounded),
-                          ),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-                      onTap: () {
-                        showTimePicker(
-                          context: context,
-                          initialTime: selectedTime,
-                        ).then((value) {
+                    Card(
+                      elevation: 3,
+                      child: DropdownButtonFormField<String>(
+                        value: dropdownvalue,
+                        hint: Icon(Icons.arrow_drop_down_outlined),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please Enter Service type';
+                          } else {
+                            return null;
+                          }
+                        },
+                        onChanged: (String? newValue) {
                           setState(() {
-                            selectedTime = value!;
-                            opentimecn.text =
-                                selectedTime.format(context).toString();
+                            dropdownvalue = newValue!;
                           });
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Please Select Time";
-                        }
-                        return null;
-                      },
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
-                    ),
-                    TextFormField(
-                      controller: closetimecn,
-                      decoration: InputDecoration(
-                          hintText: "Close Time",
-                          fillColor: Colors.indigo[100] ,
+                          if(dropdownvalue == "online"){
+                           setState(() {
+                             selectedService = 1;
+                           });
+                          } else if(dropdownvalue == "Inclinic"){
+                           setState(() {
+                             selectedService =2;
+                           });
+                          } else{
+                            setState(() {
+                              selectedService = 3;
+                            });
+                          }
+                          print("valuesss selectedd ${selectedService}");
+                        },
+                        items:items.map((String items) {
+                          return DropdownMenuItem(
+                            value: items,
+                            child: Text(items),
+                          );
+                        }).toList(),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText:
+                          '  Service Type',
                           filled: true,
-                          prefixIcon: IconButton(
-                            onPressed: () async {
-                              showTimePicker(
-                                context: context,
-                                initialTime: selectedTime1,
-                              ).then((value) {
-                                setState(() {
-                                  selectedTime1 = value!;
-                                  opentimecn.text = selectedTime1
-                                      .format(context)
-                                      .toString();
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 60,
+                    ),
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        controller:consentencycn,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Consentency Fees",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.currency_rupee),
+                            border: InputBorder.none
+                            //
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+
+                        validator: (value) {
+                          if ( value!.isEmpty) {
+                            return "Please Enter counsentency fees";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 60,
+                    ),
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        controller:storedcn,
+
+                        decoration: InputDecoration(
+                            hintText: "Enter Store Description",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.person),
+                             border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+
+                        validator: (value) {
+                          if ( value!.isEmpty) {
+                            return "Please Enter description";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 60,
+                    ),
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        controller: opentimecn,
+                        decoration: InputDecoration(
+                            hintText: "Open Time",
+                            // fillColor:  ,
+                            filled: true,
+                            prefixIcon: IconButton(
+                              onPressed: () async {
+                                showTimePicker(
+                                  context: context,
+                                  initialTime: selectedTime,
+                                ).then((value) {
+                                  setState(() {
+                                    selectedTime = value!;
+                                    opentimecn.text = selectedTime
+                                        .format(context)
+                                        .toString();
+                                  });
                                 });
-                              });
-                            },
-                            icon: const Icon(Icons.watch_later_rounded),
-                          ),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(8))),
-                      onTap: () {
-                        showTimePicker(
-                          context: context,
-                          initialTime: selectedTime1,
-                        ).then((value) {
-                          setState(() {
-                            selectedTime1 = value!;
-                            closetimecn.text =
-                                selectedTime1.format(context).toString();
+                              },
+                              icon: const Icon(Icons.watch_later_rounded),
+                            ),
+                            border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        onTap: () {
+                          showTimePicker(
+                            context: context,
+                            initialTime: selectedTime,
+                          ).then((value) {
+                            setState(() {
+                              selectedTime = value!;
+                              opentimecn.text =
+                                  selectedTime.format(context).toString();
+                            });
                           });
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty)
-                          return "Please Select Time";
-                        return null;
-                      },
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height / 60,
-                    ),
-                    DropdownButtonFormField<String>(
-                      value: selectedState,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please Enter Your state';
-                        } else {
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return "Please Select Time";
+                          }
                           return null;
-                        }
-                      },
-                      onChanged: (newValue) {
-                        setState(() {
-                          stateId=newValue;
-                          print('======${stateId}');
-                          fetch_city();
-                          // cityId=null;
-
-                        });
-                      },
-                      items:getState?.data.map((items) {
-                        return DropdownMenuItem(
-                          value: items.id.toString()??'',
-                          child: Text(items.name??''),
-
-                        );}).toList(),
-
-                      //   icon  : Icon(Icons.medical_services),
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                        hintText:
-                        '  State',
-                        fillColor: Colors.indigo[100] ,
-                        filled: true,
-                        // label: Text(  'Servive Type',)//
+                        },
                       ),
                     ),
                     SizedBox(
                       height: MediaQuery.of(context).size.height / 60,
                     ),
-                    DropdownButtonFormField<String>(
-                      // value: selectedCity,
-                      validator: (value) {
-                        if (value==null|| value.isEmpty) {
-                          return 'Please Enter Your City';
-                        } else {
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        controller: closetimecn,
+                        decoration: InputDecoration(
+                            hintText: "Close Time",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            prefixIcon: IconButton(
+                              onPressed: () async {
+                                showTimePicker(
+                                  context: context,
+                                  initialTime: selectedTime1,
+                                ).then((value) {
+                                  setState(() {
+                                    selectedTime1 = value!;
+                                    opentimecn.text = selectedTime1
+                                        .format(context)
+                                        .toString();
+                                  });
+                                });
+                              },
+                              icon: const Icon(Icons.watch_later_rounded),
+                            ),
+                            border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        onTap: () {
+                          showTimePicker(
+                            context: context,
+                            initialTime: selectedTime1,
+                          ).then((value) {
+                            setState(() {
+                              selectedTime1 = value!;
+                              closetimecn.text =
+                                  selectedTime1.format(context).toString();
+                            });
+                          });
+                        },
+                        validator: (value) {
+                          if (value == null || value.isEmpty)
+                            return "Please Select Time";
                           return null;
-                        }
-                      },
-
-                      onChanged: (newValue) {
-                        setState(() {
-                          cityId=newValue;
-                          print(cityId);
-
-
-                        });
-                      },
-
-
-                      items: getCity?.data.map((items) {
-                        return DropdownMenuItem(
-                          value: items.id.toString()??'',
-                          child: Text(items.name??''),
-                        );
-                      }).toList(),
-
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                        hintText:
-                        'City',
-                        fillColor: Colors.indigo[100] ,
-                        filled: true,
-                        // label: Text(  'Servive Type',)//
+                        },
                       ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 60,
+                    ),
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        controller:clinicnamecn,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Clinic Name",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.person),
+                           border: InputBorder.none,
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        validator: (value) {
+                          if ( value!.isEmpty) {
+                            return "Please Enter Clinic name";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 60,
+                    ),
+                    // SizedBox(
+                    //   height: MediaQuery.of(context).size.height / 60,
+                    // ),
+                    // TextFormField(
+                    //   keyboardType: TextInputType.text,
+                    //   controller: docDegreeCtr,
+                    //   decoration: InputDecoration(
+                    //       hintText: "Doctor Degree",
+                    //       fillColor: Colors.indigo[100] ,
+                    //       filled: true,
+                    //       counterText: '',
+                    //       prefixIcon:  Icon(Icons.location_on_sharp),
+                    //       border: OutlineInputBorder(
+                    //           borderRadius: BorderRadius.circular(8))),
+                    //   validator: (value) {
+                    //     if ( value!.isEmpty) {
+                    //       return "Please Enter Degree";
+                    //     }
+                    //     return null;
+                    //   },
+                    // ),
+                    const SizedBox(
+                      height: 5
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 7),
+                      child: Row(
+                        children: const [
+                          Text("Select Days"),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                        height: 5
+                    ),
+                    Card(
+                      elevation: 3,
+                      child: Container(
+                        height: 60,
+                          decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8)),
+                          //height: 50,
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: daysOfWeek.length ?? 0,
+                            itemBuilder: (BuildContext context, int index) {
+                              return InkWell(
+                                onTap: () {
+                                  if(onSelectedWeek.contains(daysOfWeek[index])){
+                                    onSelectedWeek.remove(daysOfWeek[index]);
+                                    selectedWeek = onSelectedWeek.join(",");
+                                    print("selectedd ${onSelectedWeek}");
+                                  } else{
+                                    onSelectedWeek.add(daysOfWeek[index]);
+                                    selectedWeek = onSelectedWeek.join(",");
+                                    print("selectedd@@@@@ ${onSelectedWeek}");
+                                  }
+                                  setState(() {});
+                                },
+                                child: SizedBox(
+                                              height: 20,
+                                              width: 90,
+                                              child: Card(
+                                                color: onSelectedWeek.contains(daysOfWeek[index]) ? Color(0xFF1F61AC): Colors.grey,
+                                                  child: Center(child: Text(daysOfWeek[index]),
+                                                  ),
+                                              ),
+                                ),
+                              );
+                              //   ListTile(
+                              //   title:
+                              // );
+                            },
+                          ),
+
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height / 60,
+                    ),
+                    Card(
+                      elevation: 3,
+                      child: TextFormField(
+                        keyboardType: TextInputType.text,
+                        controller:qualificationcn,
+                        decoration: const InputDecoration(
+                            hintText: "Enter Qualification",
+                            // fillColor: Colors.indigo[100] ,
+                            filled: true,
+                            counterText: '',
+                            prefixIcon:  Icon(Icons.school),
+                            border: InputBorder.none
+                            // border: OutlineInputBorder(
+                            //     borderRadius: BorderRadius.circular(8))
+                        ),
+                        validator: (value) {
+                          if ( value!.isEmpty) {
+                            return "Please Enter qualification";
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height/60,
                     ),
                   ],
                 ),
               ),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 17,
+                height: MediaQuery.of(context).size.height/17,
               ),
               InkWell(
                   onTap: () async {
                     ///1st UI
                     if(_formKey.currentState!.validate()) {
-                      await  register();
+                        register();
                       // Navigator.pushNamed(context, "myAppointments");
                     } ///2nd UI
                     // Navigator.pushNamed(context, "findPetStuff");
                   },
-                  child: CustomButton(name: "Continue")),
+                  child: const CustomButton(name: "Continue")),
               SizedBox(
-                height: MediaQuery.of(context).size.height / 20,
+                height: MediaQuery.of(context).size.height/20,
               ),
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: Text(
+                  child: const Text(
                     "Back to sign in",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                         color: Colors.black),
-                  )),
+                  ),
+              ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 20,
               ),
-              Text(
+              const Text(
                 "We'll send an OTP on above",
                 style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
               ),
-              Text(
+              const Text(
                 "given phone number",
                 style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
               ),
@@ -610,53 +756,30 @@ class _RegisterState extends State<Register> {
     );
   }
 
-  GetCity? getCity;
-  void fetch_city()async{
+  // Future<void> openPlacePicker(BuildContext context) async {
+  //   try {
+  //     LocationResult result = await showPlacePicker(
+  //       context, apiKey: "YOUR_API_KEY", // Replace with your Google Maps API key
+  //     );
+  //
+  //     if (result != null) {
+  //       print("Selected place: ${result.formattedAddress}");
+  //       setState(() {
+  //         clinicCtr.text = result.formattedAddress.toString();
+  //         // pickLat = result.geometry!.location.lat;
+  //         // pickLong = result.geometry!.location.lng;
+  //       });
+  //       Navigator.of(context).pop();
+  //       // You can do something with the selected place here
+  //     }
+  //   } catch (e) {
+  //     print("Error: $e");
+  //   }
+  // }
 
-    var headers = {
-      'Cookie': 'ci_session=2c03ee94b38d09c61ef05aca49a722333535f734'
-    };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/dr_vet_app/app/v1/api/get_cities'));
-    request.fields.addAll({
-      'state_id': '${stateId.toString()}'
-    });
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      var data=await response.stream.bytesToString() ;
-      // print('city==${data}');
-      var finalresult=GetCity.fromJson(json.decode(data));
-      setState(() {
-        getCity = finalresult;
-      });
-    }
-    else {
-      print(response.reasonPhrase);
-    }
-  }
-
-
-  GetState? getState;
-  void fetch_state()async{
-    var headers = {
-      'Cookie': 'ci_session=e32f527aeaa52b5e5592c3c5f7c2a8995e3faa40'
-    };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/dr_vet_app/app/v1/api/get_states'));
-    request.headers.addAll(headers);
-    http.StreamedResponse response = await request.send();
-    if (response.statusCode == 200) {
-      var data = await response.stream.bytesToString();
-      var finalresult = GetState.fromJson(json.decode(data));
-      setState(() {
-        getState=finalresult;
-      });
-    }
-    else {
-      print(response.reasonPhrase);
-    }
-  }
+  double pickLat = 0;
+  double pickLong = 0;
+  Position? currentLocation;
 
 
   Future<void> register() async {
@@ -672,31 +795,30 @@ class _RegisterState extends State<Register> {
       'gender': gender.toString(),
       'experience': exprincecn.text,
       'country_code': '+91',
-      'cuncultancy_fees': consentencycn.text,
+      'consultancy_fees': consentencycn.text,
       'open_time': opentimecn.text,
       'close_time': closetimecn.text,
-      'service_type': dropdownvalue.toString(),
+      'service_type': selectedService.toString(),
       'store_description': storedcn.text,
       'latitute': '22.7468891',
-      'longtitute': '75.8980215',
+      // 'doc_digree': '',
+      'longitude': '75.8980215',
       'clinic_address': clinicCtr.text,
-      'state': stateId.toString(),
-      'city': cityId.toString(),
+      'clinic_name': clinicnamecn.text,
+      'qualification': qualificationcn.text,
+      'schedule_time':selectedWeek
       //   'city': items.toString(),
     });
     print("register para ${request.fields}");
     request.headers.addAll(headers);
-
     http.StreamedResponse response = await request.send();
-
     if (response.statusCode == 200) {
       var result=await response.stream.bytesToString();
       var finalresult=jsonDecode(result);
       if(finalresult['error']==false){
-        print("responseeee ${finalresult}");
         Fluttertoast.showToast(msg: "${finalresult['message']}");
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
         // Navigator.pushNamed(context, "myAppointments");
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
       }
       else{
         Fluttertoast.showToast(msg: "${finalresult['message']}");

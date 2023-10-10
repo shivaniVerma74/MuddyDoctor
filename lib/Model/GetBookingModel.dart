@@ -84,7 +84,7 @@ class Data {
       String? image, 
       String? transactionId, 
       String? paymentType,
-     bool? isAccept,
+      bool? isAccept,
       dynamic doctorName, 
       dynamic petType, 
       dynamic petName,}){

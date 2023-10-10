@@ -81,26 +81,29 @@ class _LoginState extends State<Login> {
                 ),
                 Form(
                   key: _formKey,
-                  child:    TextFormField(
-                    keyboardType: TextInputType.phone,
-                    controller: mobilecn,
-                    maxLength: 10,
-                    decoration: InputDecoration(
-                        hintText: "Enter Mobile No",
-                        fillColor: Colors.indigo[100] ,
-                        filled: true,
-                        counterText: '',
-                        prefixIcon:  Icon(Icons.phone),
-
-                        border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8))),
-
-                    validator: (value) {
-                      if ( value!.isEmpty||value.length<10) {
-                        return "Please Enter Mobile no";
-                      }
-                      return null;
-                    },
+                  child:    Card(
+                    elevation: 3,
+                    child: TextFormField(
+                      keyboardType: TextInputType.phone,
+                      controller: mobilecn,
+                      maxLength: 10,
+                      decoration: const InputDecoration(
+                          hintText: "Enter Mobile No",
+                          // fillColor: Colors.indigo[100] ,
+                          filled: true,
+                          counterText: '',
+                          prefixIcon:  Icon(Icons.phone),
+                          border: InputBorder.none
+                          // border: OutlineInputBorder(
+                          //     borderRadius: BorderRadius.circular(8))
+                      ),
+                      validator: (value) {
+                        if ( value!.isEmpty||value.length<10) {
+                          return "Please Enter Mobile no";
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                 ),
                 SizedBox(
@@ -208,23 +211,18 @@ class _LoginState extends State<Login> {
                 //     ),
                 //   ],
                 // ),
-                SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height / 39,
-                ),
                 TextButton(
                     onPressed: () {
                       Navigator.pushNamed(context, "register");
                     },
                     child: const Text(
-                      "Skip Login",
+                      "Not a registered user? Register with us",
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 16,
                           color: Colors.black),
-                    )),
+                    ),
+                ),
               ],
             ),
           ),

@@ -24,7 +24,7 @@ class _BookingDetailsState extends State<BookingDetails> {
     };
     var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/dr_vet_app/seller/app/v1/api/upload_prescription'));
     request.fields.addAll({
-      'booking_id': '${widget?.model?.id}',
+      'booking_id': '${widget.model?.id}',
       'prescription_description': '${descriptioncn.text}'
     });
     request.files.add(await http.MultipartFile.fromPath('prescription', imageFile?.path ?? ""));
@@ -173,7 +173,7 @@ class _BookingDetailsState extends State<BookingDetails> {
                            style: TextStyle(fontSize: 15,fontWeight: FontWeight.w500),
                          ),
                          SizedBox(
-                           height: MediaQuery.of(context).size.height * .01,
+                           height: MediaQuery.of(context).size.height *.01,
                          ),
                          Container(
                            height: 100,
@@ -182,8 +182,7 @@ class _BookingDetailsState extends State<BookingDetails> {
                                controller: descriptioncn,
                                decoration: InputDecoration(
                                    hintText: '',
-                                   border: OutlineInputBorder(
-                                       borderRadius: BorderRadius.circular(10)))),
+                                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)))),
                          ),
                        ],
                     ),
@@ -242,7 +241,7 @@ class _BookingDetailsState extends State<BookingDetails> {
       setState(() {
         imageFile = File(pickedFile.path);
       });
-      Navigator.pop(context);
+     // Navigator.pop(context);
     }
   }
 
@@ -254,7 +253,7 @@ class _BookingDetailsState extends State<BookingDetails> {
       setState(() {
         imageFile = File(pickedFile.path);
       });
-      Navigator.pop(context);
+      //Navigator.pop(context);
     }
   }
 

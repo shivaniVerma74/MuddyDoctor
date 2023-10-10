@@ -13,8 +13,6 @@ import 'Screen/LoginScreen.dart';
 import 'Utils/CustomCard.dart';
 
 
-String? wallet_balance;
-
 class Account extends StatefulWidget {
   const Account({Key? key}) : super(key: key);
 
@@ -28,9 +26,14 @@ class _AccountState extends State<Account> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    walletBalance();
     // getData();
   }
 
+  walletBalance() async {
+    SharedPreferences preferences  = await SharedPreferences.getInstance();
+    wallet_balance = preferences.getString("wallet_balance");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,21 +46,34 @@ class _AccountState extends State<Account> {
               color: Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
+
                   children: [
-                    const Center(
-                      child: Text(
-                        "Account",
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height/29,
-                    ),
-                  ],
-                ),
+                  const Text(
+                    "Account",
+                    style: TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                    const SizedBox(width: 145,),
+                  const Text("Wallet Balance: "),
+                  wallet_balance == null || wallet_balance == "" ? Text("0.0"):
+                  Text("$wallet_balance", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),)
+                ],),
+                // Column(
+                //   crossAxisAlignment: CrossAxisAlignment.start,
+                //   children: [
+                //     const Center(
+                //       child: Text(
+                //         "Account",
+                //         style: TextStyle(
+                //             fontSize: 18, fontWeight: FontWeight.bold),
+                //       ),
+                //     ),
+                //     SizedBox(
+                //       height: MediaQuery.of(context).size.height/29,
+                //     ),
+                //   ],
+                // ),
               ),
             ),
             SizedBox(
