@@ -135,7 +135,7 @@ class CustomCard2 extends StatelessWidget {
         children: [
           Text(
             title,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
           ),
           SizedBox(
             height: MediaQuery.of(context).size.height / 45,
@@ -145,7 +145,7 @@ class CustomCard2 extends StatelessWidget {
               Expanded(
                 child: Text(
                   title2,
-                  style: TextStyle(color: Colors.grey,fontSize: 11),
+                  style: TextStyle(color: Colors.grey,fontSize: 11,fontFamily: "Montserrat"),
                 ),
               ),
               SizedBox(

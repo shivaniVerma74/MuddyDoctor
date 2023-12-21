@@ -38,8 +38,9 @@ class _AccountState extends State<Account> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Center(
-        child: Column(
+      child: Scaffold(
+
+        body: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
@@ -52,12 +53,12 @@ class _AccountState extends State<Account> {
                   const Text(
                     "Account",
                     style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
+                        fontSize: 16, fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
                   ),
-                    const SizedBox(width: 145,),
-                  const Text("Wallet Balance: "),
+                   Spacer(),
+                  const Text("Wallet Balance: ",style: TextStyle(fontFamily: "Montserrat"),),
                   wallet_balance == null || wallet_balance == "" ? Text("0.0"):
-                  Text("$wallet_balance", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),)
+                  Text("$wallet_balance", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold,fontFamily: "Montserrat"),)
                 ],),
                 // Column(
                 //   crossAxisAlignment: CrossAxisAlignment.start,
@@ -172,13 +173,13 @@ class _AccountState extends State<Account> {
                                 barrierDismissible: false,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: const Text("Confirm log out"),
-                                    content: const Text("Are you sure you won't to log out"),
+                                    title: const Text("Confirm log out",style: TextStyle(fontFamily: "Montserrat"),),
+                                    content: const Text("Are you sure you won't to log out",style: TextStyle(fontFamily: "Montserrat",fontSize: 13),),
                                     actions: <Widget>[
                                       ElevatedButton(
                                         style:
                                         ElevatedButton.styleFrom(primary: Color(0xFF1F61AC)),
-                                        child: const Text("YES"),
+                                        child: const Text("YES",style: TextStyle(fontFamily: "Montserrat"),),
                                         onPressed: () async {
                                           SharedPreferences prefs =
                                           await SharedPreferences.getInstance();
@@ -193,7 +194,7 @@ class _AccountState extends State<Account> {
                                       ElevatedButton(
                                         style:
                                         ElevatedButton.styleFrom(primary: Color(0xFF1F61AC)),
-                                        child: const Text("NO"),
+                                        child: const Text("NO",style: TextStyle(fontFamily: "Montserrat"),),
                                         onPressed: () {
                                           Navigator.of(context).pop();
                                         },

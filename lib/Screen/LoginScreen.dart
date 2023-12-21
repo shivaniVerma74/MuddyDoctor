@@ -38,11 +38,51 @@ class _LoginState extends State<Login> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+
+                // SizedBox(
+                //   height: MediaQuery
+                //       .of(context)
+                //       .size
+                //       .height / 12,
+                // ),
+                // Align(
+                //   alignment: Alignment.center,
+                //   child: Container(
+                //     height: 100,
+                //     width: 100,
+                //     child: Image.asset('assets/images/Group 165.png'),
+                //   ),
+                // ),
+                // Text(
+                //   "Care Provider App",
+                //   style: TextStyle(fontSize: 15, color: Colors.grey),
+                // ),
+                // SizedBox(
+                //   height: MediaQuery
+                //       .of(context)
+                //       .size
+                //       .height / 19,
+                // ),
+                // Container(
+                //   height: MediaQuery
+                //       .of(context)
+                //       .size
+                //       .height / 3,
+                //   width: MediaQuery
+                //       .of(context)
+                //       .size
+                //       .width / 1,
+                //   child: Image.asset('assets/images/Group 423.png'),
+                // ),
+                // SizedBox(
+                //   height: MediaQuery
+                //       .of(context)
+                //       .size
+                //       .height / 39,
+                // ),
+
                 SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height / 12,
+                  height: MediaQuery.of(context).size.height / 12,
                 ),
                 Align(
                   alignment: Alignment.center,
@@ -52,65 +92,83 @@ class _LoginState extends State<Login> {
                     child: Image.asset('assets/images/Group 165.png'),
                   ),
                 ),
-                Text(
-                  "Care Provider App",
-                  style: TextStyle(fontSize: 15, color: Colors.grey),
-                ),
+
                 SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height / 19,
+                  height: MediaQuery.of(context).size.height / 19,
                 ),
                 Container(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height / 3,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width / 1,
+                  height: MediaQuery.of(context).size.height / 3,
+                  width: MediaQuery.of(context).size.width / 1,
                   child: Image.asset('assets/images/Group 423.png'),
                 ),
                 SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height / 39,
+                  height: MediaQuery.of(context).size.height / 39,
                 ),
                 Form(
                   key: _formKey,
-                  child:    Card(
+                  child:
+
+                  Card(
                     elevation: 3,
-                    child: TextFormField(
-                      keyboardType: TextInputType.phone,
-                      controller: mobilecn,
-                      maxLength: 10,
-                      decoration: const InputDecoration(
-                          hintText: "Enter Mobile No",
-                          // fillColor: Colors.indigo[100] ,
-                          filled: true,
-                          counterText: '',
-                          prefixIcon:  Icon(Icons.phone),
-                          border: InputBorder.none
-                          // border: OutlineInputBorder(
-                          //     borderRadius: BorderRadius.circular(8))
+                    child: Container(
+                      height: MediaQuery.of(context).size.height/12.7,
+                      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10),),
+                      child: Center(
+                        child: TextFormField(
+                          maxLength: 10,
+                          keyboardType: TextInputType.number,
+                          controller: mobilecn,
+                          decoration: const InputDecoration(
+                            counterText: '',
+                            border: InputBorder.none,
+                            prefixIcon: Icon(Icons.call),
+                            hintText: "Enter Mobile Mobile",hintStyle: TextStyle(fontFamily: "Montserrat"),
+                          ),
+                          validator: (v) {
+                            if (v!.length < 10) {
+                              return "Enter Valid Mobile Number";
+                            }
+                          },
+                        ),
                       ),
-                      validator: (value) {
-                        if ( value!.isEmpty||value.length<10) {
-                          return "Please Enter Mobile no";
-                        }
-                        return null;
-                      },
                     ),
                   ),
+
+
+                  //
+                  // Card(
+                  //   elevation: 3,
+                  //   child: Container(
+                  //     height: MediaQuery.of(context).size.height/12.7,
+                  //
+                  //     child: TextFormField(
+                  //       keyboardType: TextInputType.phone,
+                  //       controller: mobilecn,
+                  //       maxLength: 10,
+                  //       decoration: const InputDecoration(
+                  //           hintText: "Enter Mobile No",
+                  //           // fillColor: Colors.indigo[100] ,
+                  //           filled: true,
+                  //           counterText: '',
+                  //           prefixIcon:  Icon(Icons.phone),
+                  //           border: InputBorder.none
+                  //           // border: OutlineInputBorder(
+                  //           //     borderRadius: BorderRadius.circular(8))
+                  //       ),
+                  //       validator: (value) {
+                  //         if ( value!.isEmpty||value.length<10) {
+                  //           return "Please Enter Mobile no";
+                  //         }
+                  //         return null;
+                  //       },
+                  //     ),
+                  //   ),
+                  // ),
+                  //
+
                 ),
                 SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height / 69,
+                  height: MediaQuery.of(context).size.height/69,
                 ),
                 InkWell(
                     onTap: () {
@@ -120,12 +178,14 @@ class _LoginState extends State<Login> {
                       }
                     },
                     child: CustomButton(name: "Continue")),
-                SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height / 19,
-                ),
+                // SizedBox(
+                //   height: MediaQuery
+                //       .of(context)
+                //       .size
+                //       .height / 19,
+                // ),
+
+                SizedBox(height: 10,),
                 // Text("Or quick continue with",
                 //     style: TextStyle(
                 //       fontSize: 15,
@@ -219,8 +279,8 @@ class _LoginState extends State<Login> {
                       "Not a registered user? Register with us",
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: 16,
-                          color: Colors.black),
+                          fontSize: 14,
+                          color: Colors.black,fontFamily: "Montserrat"),
                     ),
                 ),
               ],

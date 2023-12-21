@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:doctor_app/Api.pth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:place_picker/entities/location_result.dart';
 import 'package:place_picker/widgets/place_picker.dart';
 //import 'package:geolocator/geolocator.dart';
@@ -24,6 +26,7 @@ class Register extends StatefulWidget {
 var homelat;
 var homeLong;
 class _RegisterState extends State<Register> with TickerProviderStateMixin{
+
   late TabController tabController;
   final TextEditingController phonecn=TextEditingController();
   final TextEditingController namecn=TextEditingController();
@@ -44,12 +47,12 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
 
   bool isHidden=true;
 
-  String? dropdownvalue="online" ;
+  String? dropdownvalue="Online" ;
   var selectedService;
   var items = [
-    'online',
-    'Inclinic',
-    'both',
+    'Online',
+    'In-clinic',
+    'Online and In-clinic Both',
   ];
 
   //String? Service_type;
@@ -79,8 +82,8 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
           padding: const EdgeInsets.all(12),
           child: Column(
             children: [
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 12,
+              const SizedBox(
+                height: 20
               ),
               Container(
                 height: MediaQuery.of(context).size.height / 15,
@@ -106,23 +109,51 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                     const Text(
                       "Register Now",
                       style:
-                      TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                      TextStyle(fontSize: 17, fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
                     ),
                   ],
-                ),),
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 17,
+                ),
+              ),
+              const SizedBox(
+                height: 15,
               ),
               const Text(
-                "Your phone number is not registered yet.",
-                style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
+                " Set up your account by entering",
+                style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
               ),
               const Text(
-                "Let us know basic details for registration.",
-                style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
+                " the following details.",
+                style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 17,
+              const SizedBox(
+                height: 20,
+              ),
+             Container(
+               // color: Colors.red,
+               height: 120,
+               width: 120,
+               child: CircleAvatar(
+                 child: Container(
+                   height: 120,
+                   width: 120,
+                   child: ClipRRect(
+                    child: imageFile == null || imageFile == "" ?
+                    Image.network('assets/images/doctor.jpg') : Image.file(imageFile!, fit: BoxFit.fill),
+                   ),
+                 ),
+               ),
+             ),
+              InkWell(
+                onTap: () {
+                  showExitPopup("userImage");
+                },
+                child: const Padding(
+                  padding: EdgeInsets.only(top: 5),
+                  child: Text("Select Image", style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold,fontFamily: "Montserrat")),
+                ),
+              ),
+              const SizedBox(
+                height: 20,
               ),
               Form(
                 key: _formKey,
@@ -133,10 +164,10 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                       child: TextFormField(
                         controller: namecn,
                         decoration: const InputDecoration(
-                            hintText: "Enter Name",
+                            hintText: "Name",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
-                            prefixIcon:  Icon(Icons.person),
+                            prefixIcon: Icon(Icons.person),
                             border: InputBorder.none
                             // border: OutlineInputBorder(
                             //     borderRadius: BorderRadius.circular(8))
@@ -159,7 +190,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         controller: phonecn,
                         maxLength: 10,
                         decoration: const InputDecoration(
-                            hintText: "Enter Mobile No",
+                            hintText: "Mobile No",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
@@ -169,7 +200,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                             //     borderRadius: BorderRadius.circular(8))
                         ),
                         validator: (value) {
-                          if ( value!.isEmpty||value.length<10) {
+                          if ( value!.isEmpty || value.length<10) {
                             return "Please Enter Mobile no";
                           }
                           return null;
@@ -187,8 +218,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                             groupValue: gender,
                             onChanged: (value) {
                               setState(() {
-                                num = 0;
-                                gender = value.toString();
+                                num = 0; gender = value.toString();
                               });
                             }),
                         const Text("Male",
@@ -219,11 +249,11 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         keyboardType: TextInputType.emailAddress,
                         controller: emailcn,
                         decoration: const InputDecoration(
-                            hintText: "Enter Email",
+                            hintText: "Email",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
-                            prefixIcon:  Icon(Icons.email),
+                            prefixIcon: Icon(Icons.email),
                             border: InputBorder.none
                             // border: OutlineInputBorder(
                             //     borderRadius: BorderRadius.circular(8))
@@ -247,7 +277,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         obscureText: isHidden,
                         maxLength: 8,
                         decoration: InputDecoration(
-                            hintText: "Enter Password",
+                            hintText: "Password",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
@@ -300,7 +330,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         keyboardType: TextInputType.text,
                         controller: clinicCtr,
                         decoration: const InputDecoration(
-                            hintText: "Enter Address",
+                            hintText: "Address",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
@@ -326,7 +356,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         keyboardType: TextInputType.text,
                         controller:exprincecn,
                         decoration: const InputDecoration(
-                            hintText: "Enter Experience",
+                            hintText: "Experience in years",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
@@ -338,7 +368,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
 
                         validator: (value) {
                           if ( value!.isEmpty) {
-                            return "Please Enter experince";
+                            return "Please Enter experince In Year";
                           }
                           return null;
                         },
@@ -368,6 +398,22 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                     //     },
                     //   ),
                     // ),
+
+                    const SizedBox(
+                        height: 5
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 7),
+                      child: Row(
+                        children: const [
+                          Text("Select Consultation Type",style: TextStyle(fontFamily: "Montserrat"),),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(
+                        height: 5
+                    ),
+                    const SizedBox(height: 5),
                     Card(
                       elevation: 3,
                       child: DropdownButtonFormField<String>(
@@ -384,11 +430,11 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                           setState(() {
                             dropdownvalue = newValue!;
                           });
-                          if(dropdownvalue == "online"){
+                          if(dropdownvalue == "Online"){
                            setState(() {
                              selectedService = 1;
                            });
-                          } else if(dropdownvalue == "Inclinic"){
+                          } else if(dropdownvalue == "In-clinic"){
                            setState(() {
                              selectedService =2;
                            });
@@ -422,20 +468,18 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         keyboardType: TextInputType.text,
                         controller:consentencycn,
                         decoration: const InputDecoration(
-                            hintText: "Enter Consentency Fees",
+                            hintText: "Consultancy Fees",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
                             prefixIcon:  Icon(Icons.currency_rupee),
                             border: InputBorder.none
-                            //
                             // border: OutlineInputBorder(
                             //     borderRadius: BorderRadius.circular(8))
                         ),
-
                         validator: (value) {
                           if ( value!.isEmpty) {
-                            return "Please Enter counsentency fees";
+                            return "Please Enter Consultancy Fees";
                           }
                           return null;
                         },
@@ -449,9 +493,8 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                       child: TextFormField(
                         keyboardType: TextInputType.text,
                         controller:storedcn,
-
-                        decoration: InputDecoration(
-                            hintText: "Enter Store Description",
+                        decoration: const InputDecoration(
+                            hintText: "Clinic/Vet Description",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
@@ -460,10 +503,9 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                             // border: OutlineInputBorder(
                             //     borderRadius: BorderRadius.circular(8))
                         ),
-
                         validator: (value) {
                           if ( value!.isEmpty) {
-                            return "Please Enter description";
+                            return "Please Enter Clinic/Vet Description";
                           }
                           return null;
                         },
@@ -477,7 +519,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                       child: TextFormField(
                         controller: opentimecn,
                         decoration: InputDecoration(
-                            hintText: "Open Time",
+                            hintText: "Start Time",
                             // fillColor:  ,
                             filled: true,
                             prefixIcon: IconButton(
@@ -488,9 +530,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                                 ).then((value) {
                                   setState(() {
                                     selectedTime = value!;
-                                    opentimecn.text = selectedTime
-                                        .format(context)
-                                        .toString();
+                                    opentimecn.text = selectedTime.format(context).toString();
                                   });
                                 });
                               },
@@ -507,14 +547,13 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                           ).then((value) {
                             setState(() {
                               selectedTime = value!;
-                              opentimecn.text =
-                                  selectedTime.format(context).toString();
+                              opentimecn.text = selectedTime.format(context).toString();
                             });
                           });
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return "Please Select Time";
+                            return "Please Select Start Time";
                           }
                           return null;
                         },
@@ -528,7 +567,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                       child: TextFormField(
                         controller: closetimecn,
                         decoration: InputDecoration(
-                            hintText: "Close Time",
+                            hintText: "End Time",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             prefixIcon: IconButton(
@@ -539,9 +578,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                                 ).then((value) {
                                   setState(() {
                                     selectedTime1 = value!;
-                                    opentimecn.text = selectedTime1
-                                        .format(context)
-                                        .toString();
+                                    opentimecn.text = selectedTime1.format(context).toString();
                                   });
                                 });
                               },
@@ -558,14 +595,13 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                           ).then((value) {
                             setState(() {
                               selectedTime1 = value!;
-                              closetimecn.text =
-                                  selectedTime1.format(context).toString();
+                              closetimecn.text = selectedTime1.format(context).toString();
                             });
                           });
                         },
                         validator: (value) {
                           if (value == null || value.isEmpty)
-                            return "Please Select Time";
+                            return "Please Select End Time";
                           return null;
                         },
                       ),
@@ -579,7 +615,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         keyboardType: TextInputType.text,
                         controller:clinicnamecn,
                         decoration: const InputDecoration(
-                            hintText: "Enter Clinic Name",
+                            hintText: "Clinic Name",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
@@ -590,7 +626,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         ),
                         validator: (value) {
                           if ( value!.isEmpty) {
-                            return "Please Enter Clinic name";
+                            return "Please Enter Clinic Name";
                           }
                           return null;
                         },
@@ -627,7 +663,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                       padding: const EdgeInsets.only(left: 7),
                       child: Row(
                         children: const [
-                          Text("Select Days"),
+                          Text("Select Days",style: TextStyle(fontFamily: "Montserrat"),),
                         ],
                       ),
                     ),
@@ -661,10 +697,10 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                                 },
                                 child: SizedBox(
                                               height: 20,
-                                              width: 90,
+                                              width: 120,
                                               child: Card(
                                                 color: onSelectedWeek.contains(daysOfWeek[index]) ? Color(0xFF1F61AC): Colors.grey,
-                                                  child: Center(child: Text(daysOfWeek[index]),
+                                                  child: Center(child: Text(daysOfWeek[index],style: TextStyle(fontFamily: "Montserrat"),),
                                                   ),
                                               ),
                                 ),
@@ -674,7 +710,6 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                               // );
                             },
                           ),
-
                       ),
                     ),
                     SizedBox(
@@ -686,7 +721,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         keyboardType: TextInputType.text,
                         controller:qualificationcn,
                         decoration: const InputDecoration(
-                            hintText: "Enter Qualification",
+                            hintText: "Qualification",
                             // fillColor: Colors.indigo[100] ,
                             filled: true,
                             counterText: '',
@@ -697,7 +732,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                         ),
                         validator: (value) {
                           if ( value!.isEmpty) {
-                            return "Please Enter qualification";
+                            return "Please Enter Qualification";
                           }
                           return null;
                         },
@@ -709,8 +744,12 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                   ],
                 ),
               ),
+              // SizedBox(
+              //   height: MediaQuery.of(context).size.height/17,
+              // ),
+
               SizedBox(
-                height: MediaQuery.of(context).size.height/17,
+                height: MediaQuery.of(context).size.height/69,
               ),
               InkWell(
                   onTap: () async {
@@ -723,31 +762,31 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
                   },
                   child: const CustomButton(name: "Continue")),
               SizedBox(
-                height: MediaQuery.of(context).size.height/20,
+                height: MediaQuery.of(context).size.height/69,
               ),
               TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   child: const Text(
-                    "Back to sign in",
+                    "Back to Sign In",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
-                        color: Colors.black),
+                        color: Colors.black,fontFamily: "Montserrat"),
                   ),
               ),
-              SizedBox(
-                height: MediaQuery.of(context).size.height / 20,
-              ),
-              const Text(
-                "We'll send an OTP on above",
-                style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
-              ),
-              const Text(
-                "given phone number",
-                style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
-              ),
+              // SizedBox(
+              //   height: MediaQuery.of(context).size.height / 20,
+              // ),
+              // const Text(
+              //   "We'll send an OTP on above",
+              //   style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
+              // ),
+              // const Text(
+              //   "given phone number",
+              //   style: TextStyle(color: Colors.grey,fontWeight: FontWeight.bold),
+              // ),
               //   ElevatedButton(onPressed: (){getLocation();}, child: Text('location'))
             ],
           ),
@@ -777,6 +816,100 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
   //   }
   // }
 
+  final picker = ImagePicker();
+  File? imageFile;
+
+  // File? petImage;
+  // _getFromGallery() async {
+  //   PickedFile? pickedFile = await ImagePicker().getImage(
+  //     source: ImageSource.gallery,
+  //   );
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       imageFile = File(pickedFile.path);
+  //     });
+  //   }
+  // }
+  //
+  // _getFromCamera() async {
+  //   PickedFile? pickedFile = await ImagePicker().getImage(
+  //     source: ImageSource.camera,
+  //   );
+  //   if (pickedFile != null) {
+  //     setState(() {
+  //       imageFile = File(pickedFile.path);
+  //     });
+  //   }
+  // }
+
+  File? userImage;
+  Future<void> pickImage(ImageSource source, String type) async {
+    final pickedFile = await ImagePicker().pickImage(
+      source: source,
+      maxHeight: 100,
+      maxWidth: 100,
+      imageQuality: 50, // You can adjust the image quality here
+    );
+    if (pickedFile!= null) {
+      setState(() {
+        if (type == 'userImage') {
+          imageFile = File(pickedFile.path);
+        }
+      });
+    }
+  }
+
+
+  Future<bool> showExitPopup(String type) async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Select Image'),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                pickImage(ImageSource.camera, type);
+                Navigator.pop(context);
+              },
+              //return false when click on "NO"
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  Icon(Icons.camera_alt,color: Colors.white,),
+                  SizedBox(width: 10),
+                  Text('Image from Camera'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 15),
+            ElevatedButton(
+              onPressed: () {
+                pickImage(ImageSource.gallery, type);
+                Navigator.pop(context);
+                // Navigator.pop(context,true);
+                // Navigator.pop(context,true);
+              },
+              //return true when click on "Yes"
+              child:Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: const [
+                  Icon(Icons.photo,color: Colors.white,),
+                  SizedBox(width: 10),
+                  Text('Image from Gallery'),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   double pickLat = 0;
   double pickLong = 0;
   Position? currentLocation;
@@ -786,7 +919,7 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
     var headers = {
       'Cookie': 'ci_session=1f5168f9f8d6530398df5dcac5a2d39162c175d1'
     };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/dr_vet_app/seller/app/v1/api/register_doctor'));
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.registerUser));
     request.fields.addAll({
       'name': namecn.text,
       'email':emailcn.text,
@@ -801,21 +934,25 @@ class _RegisterState extends State<Register> with TickerProviderStateMixin{
       'service_type': selectedService.toString(),
       'store_description': storedcn.text,
       'latitute': '22.7468891',
-      // 'doc_digree': '',
       'longitude': '75.8980215',
       'clinic_address': clinicCtr.text,
       'clinic_name': clinicnamecn.text,
       'qualification': qualificationcn.text,
       'schedule_time':selectedWeek
-      //   'city': items.toString(),
     });
     print("register para ${request.fields}");
+
+    if(imageFile?.path!=null||imageFile?.path=='') {
+
+      request.files.add(await http.MultipartFile.fromPath('image', imageFile?.path ?? ""));
+    }
     request.headers.addAll(headers);
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
+      print("statusss ${response.statusCode}");
       var result=await response.stream.bytesToString();
       var finalresult=jsonDecode(result);
-      if(finalresult['error']==false){
+      if(finalresult['error'] == false) {
         Fluttertoast.showToast(msg: "${finalresult['message']}");
         // Navigator.pushNamed(context, "myAppointments");
         Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));

@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:doctor_app/Api.pth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart'  as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/GetBookingModel.dart';
+import '../MyAppointments.dart';
 import 'BookingDetails.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,7 +31,7 @@ void initState() {
     var headers = {
       'Cookie': 'ci_session=e0b1e4e5bfdbe304c355ea816eec9806b45369b5'
     };
-    var request = http.MultipartRequest('POST', Uri.parse('https://developmentalphawizz.com/dr_vet_app/seller/app/v1/api/get_booking'));
+    var request = http.MultipartRequest('POST', Uri.parse(ApiServicves.getBooking));
     request.fields.addAll({
       'dr_id': doctor_id.toString()
     });
@@ -73,19 +75,32 @@ void initState() {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => Account(),));
+        },
+    icon: Icon(Icons.menu),
+        ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: Color(0xFF1F61AC),
-        title: const Text("My Appointments",style: TextStyle(fontSize: 18),),
+        title: const Text("My Appointments",style: TextStyle(fontSize: 18,fontFamily: "Montserrat"),),
+
       ),
+
       body: SingleChildScrollView(
-        child:
+        child: getBookingModel!.error == true ? const Padding(
+          padding: EdgeInsets.only(top: 30),
+          child: Center(child: Text("No Bookings Found!", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800),)),
+        ):
         Column(
           children: [
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: getBookingModel?.data?.length == null || getBookingModel?.data?.length == "" ? Center(child: CircularProgressIndicator(color: Color(0xFF1F61AC))):
+              child: getBookingModel?.data?.length == null || getBookingModel?.data?.length == "" ? Container(
+                  height: MediaQuery.of(context).size.height/1.2,
+                  child: const Center(child: CircularProgressIndicator(color: Color(0xFF1F61AC)))):
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
@@ -94,34 +109,37 @@ void initState() {
                   return
                     InkWell(
                       onTap: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(model: getBookingModel?.data?[index])));
+                        // Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(model: getBookingModel?.data?[index])));
                       },
                       child: Column(
                         children: [
                           Card(
                           elevation: 5,
                           child: Container(
-                            height: 200,
+                            //height: 200,
                             decoration: BoxDecoration(borderRadius: BorderRadius.circular(10), color: Colors.white),
                             width: MediaQuery.of(context).size.width,
                             child: Padding(
-                              padding: const EdgeInsets.all(5),
+                              padding: const EdgeInsets.all(10),
                               child:
                               Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
+                                //crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
+
                                   Container(
+                                    height: 100,
+                                    width: 100,
                                     padding: const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
+                                      borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(9),
+                                      borderRadius: BorderRadius.circular(20),
                                       child: getBookingModel?.data?[index].image == null || getBookingModel?.data?[index].image == "" ?
-                                      Image.asset("assets/images/doctor2.jpg", fit: BoxFit.fill,):
+                                      Image.asset("assets/images/doctor2.jpg", fit: BoxFit.fill):
                                       Image.network(
                                         "https://developmentalphawizz.com/dr_vet_app/${getBookingModel?.data?[index].image}",
-                                        height: 200,
+                                        height: 100,
                                         width: 100,
                                         // fit: BoxFit.fill,
                                       ),
@@ -135,15 +153,20 @@ void initState() {
                                       children: [
                                         Row(
                                           children: [
-                                          const Text("Doctor Name: ", style: TextStyle(
+                                          const Text("Pet Parent’s Name: ", style: TextStyle(
                                               fontSize: 14,
-                                              fontWeight: FontWeight.bold),
+                                              fontWeight: FontWeight.bold,fontFamily: "Montserrat"
                                           ),
-                                          Text(
-                                            "${getBookingModel?.data?[index].doctorName}",
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w400),
+                                          ),
+                                          SizedBox(
+                                            width: MediaQuery.of(context).size.width/5,
+                                            child: Text(
+                                              "${getBookingModel?.data?[index].doctorName??''}",
+                                              style: const TextStyle(
+                                                  fontSize: 12, fontWeight: FontWeight.w400,fontFamily: "Montserrat"),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
                                         ],
                                         ),
@@ -152,14 +175,25 @@ void initState() {
                                         ),
                                         Row(
                                           children: [
-                                            const Text("Pet Type: ", style: TextStyle(
+                                            const Text("Pet Name: ", style: TextStyle(
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.bold)),
-                                            Text(
-                                              "${getBookingModel?.data?[index].petType}",
-                                              style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400),
+                                                fontFamily: "Montserrat",
+                                                fontWeight: FontWeight.bold),
+                                            ),
+                                            SizedBox(
+                                              width: MediaQuery.of(context).size.width/2.6,
+                                              child: Text(
+                                                "${getBookingModel?.data?[index].petName??''}",
+
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400
+                                                    ,fontFamily: "Montserrat"
+
+                                                ),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -168,18 +202,66 @@ void initState() {
                                         ),
                                         Row(
                                           children: [
-                                            const Text("Pet Name: ", style: TextStyle(
+                                            const Text("Pet Type: ", style: TextStyle(
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,fontFamily: "Montserrat")
+
                                             ),
-                                            Text(
-                                              "${getBookingModel?.data?[index].petName}",
-                                              style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400),
+                                            SizedBox(
+                                              width: MediaQuery.of(context).size.width/2.6,
+                                              child:
+
+                                              Text(
+                                               "${getBookingModel?.data?[index].petType??''}",
+
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,fontFamily: "Montserrat"),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
                                           ],
                                         ),
+
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+
+                                            SizedBox(
+                                              width: MediaQuery.of(context).size.width/3.6,
+                                              child:
+
+                                              const Text(
+                                                "Reason for Consultation: ",
+
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+
+                                            SizedBox(
+                                              width: MediaQuery.of(context).size.width/4,
+                                              child:
+
+                                              Text(
+                                                "${getBookingModel?.data?[index].petName??''}",
+
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,fontFamily: "Montserrat"),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
                                         const SizedBox(
                                           height: 5,
                                         ),
@@ -187,13 +269,44 @@ void initState() {
                                           children: [
                                             const Text("Date: ", style: TextStyle(
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
                                             ),
-                                            Text(
-                                              "${getBookingModel?.data?[index].date}",
-                                              style: const TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w400),
+                                            SizedBox(
+                                              width: MediaQuery.of(context).size.width/3,
+                                              child:
+
+                                              Text(
+                                                 getBookingModel?.data?[index].date??'',
+
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,fontFamily: "Montserrat"),
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            const Text("Time: ", style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,fontFamily: "Montserrat"),
+                                            ),
+                                            SizedBox(
+                                              width: MediaQuery.of(context).size.width/4,
+                                              child: Text(
+                                                getBookingModel?.data?[index].timeSlot??'',
+                                                style: const TextStyle(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w400,fontFamily: "Montserrat"),
+                                                maxLines: 2,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -206,33 +319,36 @@ void initState() {
                                             InkWell(
                                               onTap: () {
                                                 getBookingModel?.data?[index].isAccept = true;
-                                                setState(() {
-                                                });
+                                                setState(() {});
                                                 updateStatus(index, 1);
                                                 },
                                               child: Container(
                                                 height: 30,
-                                                width: 70,
-                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Color(0xFF1F61AC)),
+                                                width: MediaQuery.of(context).size.width/3.6,
+                                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: const Color(0xFF1F61AC)),
                                                 // width: MediaQuery.of(context).size.width,
                                                 child: const Center(
-                                                  child:
-                                                  Text("Accept", style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight: FontWeight.w500, color: Colors.white),
+                                                  child: Text("Mark Complete", style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w500, color: Colors.white,fontFamily: "Montserrat"),
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                             const SizedBox(width: 20),
-                                             Container(
-                                               height: 30,
-                                               width: 70,
-                                               decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Color(0xFF1F61AC)),
-                                               child: const Center(
-                                                 child: Text("Reject", style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500, color: Colors.white)),
+                                             const SizedBox(width: 5),
+                                             InkWell(
+                                               onTap: () {
+                                                 Navigator.push(context, MaterialPageRoute(builder: (context) => BookingDetails(model: getBookingModel?.data?[index])));
+                                               },
+                                               child: Container(
+                                                 height: 30,
+                                                 width: MediaQuery.of(context).size.width/3.6,
+                                                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Color(0xFF1F61AC)),
+                                                 child: const Center(
+                                                   child: Text("Enter Remarks", style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight: FontWeight.w500, color: Colors.white,fontFamily: "Montserrat")),
+                                                 ),
                                                ),
                                              ),
                                           ],
@@ -240,13 +356,13 @@ void initState() {
                                         getBookingModel?.data?[index].status == '1'||( getBookingModel?.data?[index].isAccept ?? false)?
                                         Container(
                                           height: 30,
-                                          width: 70,
+                                          width: MediaQuery.of(context).size.width/3.7,
                                           decoration: BoxDecoration(borderRadius: BorderRadius.circular(5), color: Color(0xFF1F61AC)),
                                           // width: MediaQuery.of(context).size.width,
                                           child: const Center(
-                                            child: Text("Complete", style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500, color: Colors.white),
+                                            child: Text("Completed", style: TextStyle(
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500, color: Colors.white,fontFamily: "Montserrat"),
                                             ),
                                           ),
                                         ):
@@ -262,7 +378,7 @@ void initState() {
                                           child: const Center(
                                             child: Text("Completed", style: TextStyle(
                                                 fontSize: 14,
-                                                fontWeight: FontWeight.w500, color: Colors.white),
+                                                fontWeight: FontWeight.w500, color: Colors.white,fontFamily: "Montserrat"),
                                             ),
                                           ),
                                         ):
@@ -272,6 +388,8 @@ void initState() {
                                       ],
                                     ),
                                   ),
+
+
                                 ],
                               ),
                             ),

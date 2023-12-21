@@ -56,7 +56,7 @@ class _FaqScreenState extends State<FaqScreen> {
         elevation: 0,
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: const Text("Faqs", style: TextStyle(fontSize: 18, color: Colors.black), ),),
+        title: const Text("Faqs", style: TextStyle(fontSize: 18, color: Colors.black,fontFamily: "Montserrat"), ),),
       body: SingleChildScrollView(
         child:  Column(
           children: [
@@ -81,7 +81,7 @@ class _FaqScreenState extends State<FaqScreen> {
                                   faqModel?.data?[index].question ?? "",
                                   style: const TextStyle(
                                       color: Colors.black,
-                                      fontWeight: FontWeight.w500
+                                      fontWeight: FontWeight.w500,fontFamily: "Montserrat"
                                   ),
                                 ),
                               ),
@@ -97,7 +97,7 @@ class _FaqScreenState extends State<FaqScreen> {
                                         child: Text(
                                           faqModel?.data?[index].answer ?? "",
                                           style: const TextStyle(
-                                              color: Colors.black
+                                              color: Colors.black,fontFamily: "Montserrat"
                                           ),
                                         ),
                                       ),

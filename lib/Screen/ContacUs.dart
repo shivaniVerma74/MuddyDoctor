@@ -69,7 +69,7 @@ class _ContactusState extends State<Contactus> {
               child: const Icon(Icons.arrow_back_ios, color: Colors.black)),
           backgroundColor: Colors.white,
           centerTitle: true,
-          title: const Text("Contact Us", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),),
+          title: const Text("Contact Us", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black,fontFamily: "Montserrat"),),
         ),
         body: ListView(
           children: [

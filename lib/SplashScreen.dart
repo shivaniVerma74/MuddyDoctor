@@ -42,7 +42,7 @@ class _splashScreenState extends State<splashScreen> {
       if (finalOtp == null || finalOtp ==  '') {
         Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const Login()));
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const BottomNavigationBarExampleApp()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> const HomeScreen()));
       }
     },);
   }

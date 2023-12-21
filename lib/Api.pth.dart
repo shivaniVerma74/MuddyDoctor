@@ -3,7 +3,7 @@ class ApiServicves{
   static const String baseUrl = "https://developmentalphawizz.com/dr_vet_app/seller/app/v1/api/";
   static const String imageUrl = "https://developmentalphawizz.com/dr_vet_app/";
 
-  static const String registerUser = baseUrl+'register_user';
+  static const String registerUser = baseUrl+'register_doctor';
   static const String login = baseUrl+'login';
   static const String verifyOtpUser = baseUrl+'verify_otp_user';
   static const String getCat = baseUrl+"get_cat";

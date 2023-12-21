@@ -16,7 +16,7 @@ class _CustomButtonState extends State<CustomButton> {
       width: MediaQuery.of(context).size.width / 1,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
-        color: Colors.blue,
+        color: Color(0xFF1F61AC),
       ),
       child: Center(
           child: Text(
@@ -24,7 +24,7 @@ class _CustomButtonState extends State<CustomButton> {
             style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w500,
-                color: Colors.white),
+                color: Colors.white,fontFamily: "Montserrat"),
           )),
     );
   }

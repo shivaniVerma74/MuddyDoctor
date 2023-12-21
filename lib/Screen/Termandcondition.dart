@@ -67,7 +67,7 @@ class _TermsState extends State<Terms> {
               child: const Icon(Icons.arrow_back_ios, color: Colors.black)),
           backgroundColor: Colors.white,
           centerTitle: true,
-          title: Text("Terms & Condition", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black),),
+          title: Text("Terms & Condition", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black,fontFamily: "Montserrat"),),
         ),
         body: ListView(
           children: [
